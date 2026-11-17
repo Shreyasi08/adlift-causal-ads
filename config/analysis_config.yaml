@@ -1,0 +1,37 @@
+# Analysis thresholds, decision rules, cost assumptions (PRD §6.3). Illustrative; see reports/assumptions.md.
+alpha: 0.05
+power: 0.80
+two_sided: true
+bootstrap: {n_resamples: 2000, seed: 20260102}
+
+primary_metric: conversion_rate
+secondary_metrics: [ctr, vtr]
+guardrails:
+  skip_rate:                {max_abs_increase: 0.01}
+  organic_watch_minutes:    {max_rel_decrease: 0.01}
+  negative_feedback_per_1k: {max_rel_increase: 0.05}
+multiple_testing: {secondary: holm}
+
+min_practical_lift_conversion: 0.02   # +2% relative
+planned_weeks: 4
+preregistered_segments: [device, is_new_viewer]
+
+economics:                            # illustrative
+  revenue_per_conversion: 12.0        # platform revenue per incremental conversion (USD)
+  ai_cost_per_creative: 0.50
+  creatives_per_viewer_week: 0.02
+  ai_serving_cost_per_1k_impressions: 0.05
+
+decision_rule: lower_bound_95ci_incremental_profit_gt_0_and_guardrails_pass
+
+uplift:
+  learners: [s, t, x, causal_forest]
+  test_size: 0.3
+  cv_folds: 5
+  top_k: [0.1, 0.2, 0.3]
+  criteo: {sample_fraction: 0.10, seed: 20260103}
+
+# ---- Phase 2/3 (future) ----
+# advertiser: {primary_metric: weekly_spend, churn_window_weeks: 2}
+# forecast: {holdout_weeks: 26, horizon_weeks: 52, mc_draws: 5000, quantiles: [0.1, 0.5, 0.9]}
+# geo: {placebo_alpha: 0.05}
